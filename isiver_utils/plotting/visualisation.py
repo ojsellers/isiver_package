@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
-import isiver_utils.mpl_finance_modified as mpf # old mpl-finance library - gives full matplotlib customisation
+import isiver_utils.plotting.mpl_finance_modified as mpf # old mpl-finance library - gives full matplotlib customisation
 
 def daily_ohlcv(*stock_classes, output_window=True, save_fig=False,
                 save_dir=default_plot_dir, **kwargs):
