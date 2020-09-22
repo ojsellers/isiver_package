@@ -17,7 +17,7 @@ class stock_dataframe():
     def __init__(self, ticker, start_date, df):
         '''This class represents a dataframe that can be used to scrape up to
         date market data from yfinance api or perform cleaning and add columns
-        :param ticker: the code used to represent the stock entered in form
+        :param ticker: the code used to represent the stock entered in from
                         suitable for SQL and adjusted here for yfinance
         :param start_date: date from which the market data should be gathered
                         can be set to None and will download past 5 years
@@ -73,7 +73,7 @@ class stock_dataframe():
         self.df.iat[0, len(self.df.columns) - 1] = 1
         return self.df
 
-    def moving_averages(self, t_frame=50):
+    def returns_ma(self, t_frame=50):
         '''Fn to create a new column in dataframe for moving averages of Returns
         :param t_frame: number of days over which moving average is taken
         :return: updated dataframe'''
@@ -82,11 +82,25 @@ class stock_dataframe():
         self.df['ReturnsMA'] = self.df['Returns'].rolling(window=t_frame).mean()
         return self.df
 
+    def close_ma(self, *new_windows, windows=(20, 30, 50)):
+        '''Function to calculate moving averages for close price. *new_windows
+        allows function to be called dynamically, to add column(s) to dataframe
+        for moving average over non-default window(s).
+        '''
+        if new_windows:
+            windows=new_windows # Don't recalc default ma if called externally
+        for w in windows:
+                if F'MA{w}' in self.df:
+                    del self.df[F'MA{w}']
+                self.df[F'MA{w}'] = self.df['Close'].rolling(window=w).mean()
+        return self.df
+
     def pre_process(self, clean):
         if clean:
             self.clean_data()
         self.returns()
-        self.moving_averages()
+        self.returns_ma()
+        self.close_ma()
         return self.df
 
     def new_stock_df(self):
