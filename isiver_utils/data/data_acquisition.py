@@ -129,9 +129,7 @@ class stock_dataframe():
             if column in self.df:
                 del self.df[column]
 
-    def pre_process(self, clean):
-        if clean:
-            self.clean_data()
+    def calculate_metrics(self):
         self.returns()
         self.returns_ma()
         self.close_ma()
@@ -139,6 +137,12 @@ class stock_dataframe():
         self.macd()
         self.ma_std()
         self.bollinger()
+        return self.df
+
+    def pre_process(self, clean):
+        if clean:
+            self.clean_data()
+        self.calculate_metrics()
         return self.df
 
     def new_stock_df(self):
