@@ -9,6 +9,10 @@ Kind regards,
 
 Ollie
 
+Ollie's To Do:
+- Write generalised rolling metric function
+
+
 Added to Isiver repo on 29/07/2020.
 Script containing stock_dataframe class used to download, clean, and perform
 single stock analysis with. 
