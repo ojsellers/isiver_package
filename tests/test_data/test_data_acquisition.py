@@ -17,3 +17,15 @@ def test_data(ticker='SMT_L'):
     assert(len(df.columns)) == 8
     print('...data test passed')
     return ticker, df, start_date
+
+def test_df_output(ticker='SMT_L', history_days=200):
+    '''
+    Fn to generate stock class and print dataframe for of given ticker to
+    command line, to inspect functionailty of preprocessing methods and fidelity
+    of stock data.
+    '''
+    start_date = str(date.today() - timedelta(days=history_days))
+    stock_class = data_acquisition.stock_dataframe(ticker, start_date,
+                                                   pd.DataFrame())
+    stock_class.new_stock_df()
+    print(stock_class.df.tail(20))
