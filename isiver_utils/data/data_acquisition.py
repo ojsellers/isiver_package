@@ -111,6 +111,17 @@ class stock_dataframe():
             self.df[F'MASD-{w}'] = self.df['Close'].rolling(window=w).std()
             return self.df
 
+    def bollinger(self, windows=(20,)):
+        for w in windows:
+            self.check_columns(F'BollUpper-{w}', F'BollLower-{w}')
+            if F'MA{w}' or F'MASD-{w}' not in self.df:
+                self.close_ma((w,))
+                self.ma_std((w,))
+            self.df[F'BollUpper-{w}'] = \
+                self.df[F'MA{w}'] + (2 * self.df[F'MASD-{w}'])
+            self.df[F'BollLower-{w}'] = \
+                self.df[F'MA{w}'] - (2 * self.df[F'MASD-{w}'])
+
     def check_columns(self, *columns):
         '''Function to check if column exists already in dataframe and delete if
         true.'''
@@ -127,6 +138,7 @@ class stock_dataframe():
         self.close_exp_ma()
         self.macd()
         self.ma_std()
+        self.bollinger()
         return self.df
 
     def new_stock_df(self):
