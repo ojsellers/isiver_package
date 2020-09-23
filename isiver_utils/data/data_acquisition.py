@@ -83,46 +83,46 @@ class stock_dataframe():
     def close_ma(self, windows=(20, 30, 50)):
         '''Function to calculate moving averages for close price.'''
         for w in windows:
-            self.check_columns(F'MA{w}')
-            self.df[F'MA{w}'] = self.df['Close'].rolling(window=w).mean()
+            self.check_columns(F'MA-{w}')
+            self.df[F'MA-{w}'] = self.df['Close'].rolling(window=w).mean()
         return self.df
 
     def close_exp_ma(self, windows=(12, 26)):
         '''Function to calculate exponential moving averages for close price.'''
         for w in windows:
-            self.check_columns(F'EMA{w}')
-            self.df[F'EMA{w}'] = self.df['Close'].ewm(span=w).mean()
+            self.check_columns(F'EMA-{w}')
+            self.df[F'EMA-{w}'] = self.df['Close'].ewm(span=w).mean()
         return self.df
 
     def macd(self, windows=(12, 26)):
         '''Function to add moving average convergence divergence column to df.
         Default value uses 12 and 26 period ema's'''
         self.check_columns(F'MACD-{windows[0]}-{windows[1]}')
-        if F'EMA{windows[0]}' or F'EMA{windows[1]}' not in self.df:
+        if F'EMA-{windows[0]}' or F'EMA-{windows[1]}' not in self.df:
             self.close_exp_ma(windows=(windows[0], windows[1]))
         self.df[F'MACD-{windows[0]}-{windows[1]}'] = \
-            self.df[F'EMA{windows[0]}'] - self.df[F'EMA{windows[1]}']
+            self.df[F'EMA-{windows[0]}'] - self.df[F'EMA-{windows[1]}']
 
     def ma_std(self, windows=(20,)):
         '''Fn to calculate standard deviation of close price for specified
-        rolling windows'''
+        rolling windows. Defaults to rolling window of 20 days'''
         for w in windows:
             self.check_columns(F'MASD-{w}')
             self.df[F'MASD-{w}'] = self.df['Close'].rolling(window=w).std()
             return self.df
 
     def bollinger(self, windows=(20,)):
-        '''Fn to calculate upper and lower bollinger bands for stock close price
-        '''
+        '''Fn to calculate upper and lower bollinger bands for stock close price.
+        Defaults to 20 window rolling average and s.d'''
         for w in windows:
             self.check_columns(F'BollUpper-{w}', F'BollLower-{w}')
-            if F'MA{w}' or F'MASD-{w}' not in self.df:
+            if F'MA-{w}' or F'MASD-{w}' not in self.df:
                 self.close_ma((w,))
                 self.ma_std((w,))
             self.df[F'BollUpper-{w}'] = \
-                self.df[F'MA{w}'] + (2 * self.df[F'MASD-{w}'])
+                self.df[F'MA-{w}'] + (2 * self.df[F'MASD-{w}'])
             self.df[F'BollLower-{w}'] = \
-                self.df[F'MA{w}'] - (2 * self.df[F'MASD-{w}'])
+                self.df[F'MA-{w}'] - (2 * self.df[F'MASD-{w}'])
 
     def check_columns(self, *columns):
         '''Fn to check if column exists already in dataframe and delete if
