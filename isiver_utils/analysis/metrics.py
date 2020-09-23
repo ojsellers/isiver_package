@@ -85,7 +85,7 @@ def sharpes(df, rf=0.01):
 
 def get_metrics(df, start_date, base_df, risk_free_df):
     '''
-    Function to get sharpes, alpha, and beta metrics 
+    Function to get all above metrics: sharpes, alpha, and beta
 
     :param df: stock dataframe of interest
     :param start_date: start date to calculate metrics from
