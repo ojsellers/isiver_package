@@ -19,7 +19,6 @@ class test_dataframe(unittest.TestCase):
         self.assertTrue(149<=len(df)<=151)
         self.assertEqual(len(df.columns), 17)
         print('...data test passed')
-        return ticker, df, start_date
 
 if __name__ == '__main__':
     unittest.main()
