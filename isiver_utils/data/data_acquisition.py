@@ -98,7 +98,7 @@ class stock_dataframe():
         '''
         pass
 
-    def moving_averages(self, column, *windows):
+    def moving_averages(self, column):
         '''
         Generalised function to calculate and append a moving averages column
         
@@ -106,18 +106,14 @@ class stock_dataframe():
         :param windows: args int of time windows (days) for moving averages
                 to be calculated over
         '''
-        for w in windows:
-            self.check_columns(f'{column}_MA_{w}')
-            self.df[f'{column}_MA_{w}'] = self.df[column].rolling(window=w).mean()
+        self.df[f'{column}_MA_{w}'] = self.df[column].rolling(window=w).mean()
         return self.df
     
-    def exp_moving_averages(self, column, *windows):
+    def exp_moving_averages(self, column):
         '''
         Generalised function to calculate exponential moving averages
         '''
-        for w in windows:
-            self.check_columns(f'{column}_EMA_{w}')
-            self.df[f'{column}_EMA_{w}'] = self.df['Close'].ewm(span=w).mean()
+        self.df[f'{column}_EMA_{w}'] = self.df['Close'].ewm(span=w).mean()
         return self.df
                             
     def returns_ma(self, t_frame=50):
@@ -198,8 +194,8 @@ class stock_dataframe():
     
     def get_metrics(self):
         self.returns()
-        self.moving_averages('Returns', 50)
-        self.moving_averages('Close', 20, 30, 50)
+        self.returns_ma()
+        self.close_ma()
         self.close_exp_ma()
         self.macd()
         self.ma_std()
