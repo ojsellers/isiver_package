@@ -1,5 +1,5 @@
 '''
-unit tests for data_acquisition file and stock_dataframe class
+Unit testing for data_acquisition file and stock_dataframe class
 '''
 
 from isiver_utils.data.data_acquisition import stock_dataframe
@@ -10,9 +10,11 @@ import unittest
 class test_dataframe(unittest.TestCase):
 
     def test_data(self, ticker='SMT_L'):
-        '''Fn to test stock_dataframe and the yfinance API is working
+        '''
+        Fn to test stock_dataframe and the yfinance API is working
         - len(df) assertion is given range to account for bank holidays at the ends
-        of the time periods'''
+        of the time periods
+        '''
         print('testing data...')
         start_date = str(date.today() - timedelta(days=210))
         df = stock_dataframe(ticker, start_date, pd.DataFrame()).new_stock_df()

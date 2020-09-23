@@ -16,6 +16,7 @@ setup(name='isiver_utils',
         'mplfinance',
         'datetime',
         'pandas_datareader',
-        'scipy'
+        'scipy',
+        'pickle'
         ],
     zip_safe=True)
