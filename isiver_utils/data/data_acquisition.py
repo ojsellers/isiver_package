@@ -112,6 +112,8 @@ class stock_dataframe():
             return self.df
 
     def bollinger(self, windows=(20,)):
+        '''Fn to calculate upper and lower bollinger bands for stock close price
+        '''
         for w in windows:
             self.check_columns(F'BollUpper-{w}', F'BollLower-{w}')
             if F'MA{w}' or F'MASD-{w}' not in self.df:
@@ -123,8 +125,8 @@ class stock_dataframe():
                 self.df[F'MA{w}'] - (2 * self.df[F'MASD-{w}'])
 
     def check_columns(self, *columns):
-        '''Function to check if column exists already in dataframe and delete if
-        true.'''
+        '''Fn to check if column exists already in dataframe and delete if
+        true'''
         for column in columns:
             if column in self.df:
                 del self.df[column]

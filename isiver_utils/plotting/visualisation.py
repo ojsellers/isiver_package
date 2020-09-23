@@ -178,20 +178,22 @@ def add_indicator_arrow(ax, date, price, text, colour):
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)
 
-def format_plot(fig, axes, **kwargs):
+def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
+                ax1_colour='#07000d', spine_colour='#1ABC9C', tick_colour='w',
+                max_dticks=30):
     '''
     Use **kwargs to dynamically assign any non-default parameters
     '''
 
-    fig.set_size_inches(kwargs.get('plot_size', (14, 9)))
-    fig.set_facecolor(kwargs.get('background_colour', '#07000d'))
+    fig.set_size_inches(plot_size)
+    fig.set_facecolor(background_colour)
 
     for ax in axes:
-        ax.set_facecolor(kwargs.get('ax1_colour', '#07000d'))
-        plt.setp(ax.spines.values(), color=kwargs.get('spine_colour', '#1ABC9C'))
-        ax.tick_params(colors=kwargs.get('tick_colour', 'w'))
+        ax.set_facecolor(ax1_colour)
+        plt.setp(ax.spines.values(), color=spine_colour)
+        ax.tick_params(colors=tick_colour)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        ax.xaxis.set_major_locator(mticker.MaxNLocator(kwargs.get('max_dticks', 30)))
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(max_dticks=max_dticks))
 
     return fig, axes
 
