@@ -118,12 +118,16 @@ class stock_dataframe():
             if column in self.df:
                 del self.df[column]
 
+    def get_defaults(self):
+            default_metrics.get_def_metrics(self.df)
+            return self.df
+
     def pre_process(self, clean):
         if clean:
             self.clean_data()
         self.returns()
         self.returns_ma()
-        default_metrics.get_def_metrics(self.df)
+        self.get_defaults()
         return self.df
 
     def new_stock_df(self):
