@@ -25,6 +25,8 @@ from pandas_datareader import data as pdr
 yf.pdr_override()
 import pandas as pd
 from datetime import datetime, timedelta, date
+from isiver_utils.analysis import default_metrics
+
 
 class stock_dataframe():
     def __init__(self, ticker, start_date, df):
@@ -95,31 +97,6 @@ class stock_dataframe():
         self.df.iat[0, len(self.df.columns) - 1] = 1
         return self.df
 
-    def get_rolling_metric(self, column, metric, *windows):
-        '''
-        This will be generalised to allow the calculation of
-        a rolling metric over different windows
-        '''
-        pass
-
-    def moving_averages(self, column):
-        '''
-        Generalised function to calculate and append a moving averages column
-
-        :param column: string name of column to calculate moving averages for
-        :param windows: args int of time windows (days) for moving averages
-                to be calculated over
-        '''
-        self.df[f'{column}_MA_{w}'] = self.df[column].rolling(window=w).mean()
-        return self.df
-
-    def exp_moving_averages(self, column):
-        '''
-        Generalised function to calculate exponential moving averages
-        '''
-        self.df[f'{column}_EMA_{w}'] = self.df['Close'].ewm(span=w).mean()
-        return self.df
-
     def returns_ma(self, t_frame=50):
         '''
         DEPRECATED
@@ -132,61 +109,6 @@ class stock_dataframe():
         self.df['ReturnsMA'] = self.df['Returns'].rolling(window=t_frame).mean()
         return self.df
 
-    def close_ma(self, windows=(20, 30, 50)):
-        '''
-        DEPRECATED
-        Function to calculate moving averages for close price.
-        '''
-        for w in windows:
-            self.check_columns(F'MA-{w}')
-            self.df[F'MA-{w}'] = self.df['Close'].rolling(window=w).mean()
-        return self.df
-
-    def close_exp_ma(self, windows=(12, 26)):
-        '''
-        DEPRECATED
-        Function to calculate exponential moving averages for close price.
-        '''
-        for w in windows:
-            self.check_columns(F'EMA-{w}')
-            self.df[F'EMA-{w}'] = self.df['Close'].ewm(span=w).mean()
-        return self.df
-
-    def macd(self, windows=(12, 26)):
-        '''
-        Function to add moving average convergence divergence column to df.
-        Default value uses 12 and 26 period ema's
-        '''
-        self.check_columns(F'MACD-{windows[0]}-{windows[1]}')
-        if F'EMA-{windows[0]}' or F'EMA-{windows[1]}' not in self.df:
-            self.close_exp_ma(windows=(windows[0], windows[1]))
-        self.df[F'MACD-{windows[0]}-{windows[1]}'] = \
-            self.df[F'EMA-{windows[0]}'] - self.df[F'EMA-{windows[1]}']
-
-    def ma_std(self, windows=(20,)):
-        '''
-        Fn to calculate standard deviation of close price for specified
-        rolling windows
-        '''
-        for w in windows:
-            self.check_columns(F'MASD-{w}')
-            self.df[F'MASD-{w}'] = self.df['Close'].rolling(window=w).std()
-        return self.df
-
-    def bollinger(self, windows=(20,)):
-        '''
-        Fn to calculate upper and lower bollinger bands for stock close price
-        '''
-        for w in windows:
-            self.check_columns(F'BollUpper-{w}', F'BollLower-{w}')
-            if F'MA-{w}' or F'MASD-{w}' not in self.df:
-                self.close_ma((w,))
-                self.ma_std((w,))
-            self.df[F'BollUpper-{w}'] = \
-                self.df[F'MA-{w}'] + (2 * self.df[F'MASD-{w}'])
-            self.df[F'BollLower-{w}'] = \
-                self.df[F'MA{w}'] - (2 * self.df[F'MASD-{w}'])
-
     def check_columns(self, *columns):
         '''
         Fn to check if column exists already in dataframe and delete if
@@ -196,20 +118,12 @@ class stock_dataframe():
             if column in self.df:
                 del self.df[column]
 
-    def get_metrics(self):
-        self.returns()
-        self.returns_ma()
-        self.close_ma()
-        self.close_exp_ma()
-        self.macd()
-        self.ma_std()
-        self.bollinger()
-        return self.df
-
     def pre_process(self, clean):
         if clean:
             self.clean_data()
-        self.calculate_metrics()
+        self.returns()
+        self.returns_ma()
+        default_metrics.get_def_metrics(self.df)
         return self.df
 
     def new_stock_df(self):

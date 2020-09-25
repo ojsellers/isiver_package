@@ -11,6 +11,7 @@ from isiver_utils.data.data_acquisition import stock_dataframe
 import numpy as np
 import pandas as pd
 
+
 def update_returns(start_date, df):
     '''
     This is used to update the returns column of a dataframe by resampling
@@ -24,6 +25,7 @@ def update_returns(start_date, df):
     '''
     return stock_dataframe('',None,df[df.index>=start_date]).pre_process(False)
 
+
 def risk_free_rate(start_date, risk_free_df):
     '''
     This returns the risk free rate for a specified risk free stock dataframe
@@ -35,6 +37,7 @@ def risk_free_rate(start_date, risk_free_df):
     '''
     return (update_returns(start_date, risk_free_df)['Returns']).tail(1) - 1
 
+
 def covariance(df, base):
     '''
     Calculate covariance matrix for stock df against base stock
@@ -44,6 +47,7 @@ def covariance(df, base):
     :return: np 2x2 covariance matrix
     '''
     return np.cov(df['Returns'], base)
+
 
 def beta(cov_matrix):
     '''
@@ -56,6 +60,7 @@ def beta(cov_matrix):
     if cov_matrix[1][1] == 0:
         return np.nan
     return (cov_matrix[0][1] / cov_matrix[1][1])
+
 
 def alpha(df, beta_value, rf, base):
     '''
@@ -70,6 +75,7 @@ def alpha(df, beta_value, rf, base):
     a = (df['Returns'].tail(1) - 1) - rf - beta_value * ((base.tail(1)-1) - rf)
     return a.iloc[0] * 100
 
+
 def sharpes(df, rf=0.01):
     '''
     Function to calculate Sharpe's ratio which is a combined measure of risk vs
@@ -82,6 +88,7 @@ def sharpes(df, rf=0.01):
     if np.std(df['Returns']) == 0:
         return np.nan
     return (((df['Returns'].tail(1) - 1) - rf) / np.std(df['Returns'])).iloc[0]
+
 
 def get_metrics(df, start_date, base_df, risk_free_df):
     '''
