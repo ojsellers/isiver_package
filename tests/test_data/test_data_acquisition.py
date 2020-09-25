@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, date
 import pandas as pd
 import unittest
 
+
 class test_dataframe(unittest.TestCase):
 
     def test_data(self, ticker='SMT_L'):
@@ -21,6 +22,7 @@ class test_dataframe(unittest.TestCase):
         self.assertTrue(149<=len(df)<=151)
         self.assertEqual(len(df.columns), 17)
         print('...data test passed')
+
 
 if __name__ == '__main__':
     unittest.main()

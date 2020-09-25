@@ -103,18 +103,6 @@ def std(df, *columns, windows=(20,)):
     return df
 
 
-def get_def_metrics(df):
-    '''
-    Function to apply all above metrics to supplied stock dataframe.
-    '''
-    ma(df, 'Close')
-    exp_ma(df, 'Close')
-    macd(df, 'Close')
-    bollinger(df, 'Close')
-    std(df, 'Close_MA_20')
-    return df
-
-
 def check_columns(df, *columns):
     '''
     Fn to check if column exists already in dataframe and delete if

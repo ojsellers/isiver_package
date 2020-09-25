@@ -118,16 +118,23 @@ class stock_dataframe():
             if column in self.df:
                 del self.df[column]
 
-    def get_defaults(self):
-            default_metrics.get_def_metrics(self.df)
-            return self.df
+    def get_def_metrics(self):
+        '''
+        Function to apply all above metrics to supplied stock dataframe.
+        '''
+        default_metrics.ma(self.df, 'Close')
+        default_metrics.exp_ma(self.df, 'Close')
+        default_metrics.macd(self.df, 'Close')
+        default_metrics.std(self.df, 'Close_MA_20')
+        default_metrics.bollinger(self.df, 'Close')
+        return self.df
 
     def pre_process(self, clean):
         if clean:
             self.clean_data()
         self.returns()
         self.returns_ma()
-        self.get_defaults()
+        self.get_def_metrics()
         return self.df
 
     def new_stock_df(self):
