@@ -1,6 +1,4 @@
 '''
-@author = Isaac
-
 Module to provide calculation of default metrics for stock dataframes.
 
 TODO:
