@@ -97,6 +97,7 @@ class stock_dataframe():
         Function to apply all above metrics to supplied stock dataframe
         '''
         print('I don't think all of these should be default metrics')
+        print('I reckon we should get these functions to return a series and assign that series to a column in-class. Also, we can then only send the function one column rather than the df and a column name')
         metrics.ma(self.df, 'Close')
         metrics.exp_ma(self.df, 'Close')
         metrics.macd(self.df, 'Close')
