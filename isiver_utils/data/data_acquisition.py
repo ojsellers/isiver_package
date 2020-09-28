@@ -25,7 +25,7 @@ from pandas_datareader import data as pdr
 yf.pdr_override()
 import pandas as pd
 from datetime import datetime, timedelta, date
-from isiver_utils.analysis import default_metrics
+from isiver_utils.analysis import metrics
 
 
 class stock_dataframe():
