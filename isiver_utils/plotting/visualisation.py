@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
-import mpl_finance_modified as mpf # old mpl-finance library - gives full matplotlib customisation
+from isiver_utils.plotting import mpl_finance_modified as mpf
 
 # Default plot save directory
 default_plot_dir = os.getcwd() + '/plots/'
@@ -193,7 +193,7 @@ def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
         plt.setp(ax.spines.values(), color=spine_colour)
         ax.tick_params(colors=tick_colour)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        ax.xaxis.set_major_locator(mticker.MaxNLocator(max_dticks=max_dticks))
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(max_dticks))
 
     return fig, axes
 
