@@ -1,6 +1,4 @@
 '''
-@author = Ollie
-
 This file is used to calculate common performance metrics for a certain stock,
 requires the provision of a dataframe for a risk free stock (e.g. government
 bonds) and a dataframe for a baseline stock (e.g. FTSE 100 tracker for a FTSE
