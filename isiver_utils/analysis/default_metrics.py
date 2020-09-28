@@ -2,6 +2,10 @@
 @author = Isaac
 
 Module to provide calculation of default metrics for stock dataframes.
+
+TODO:
+    - Exponential rsi
+    - Deltas and mivng avg deltas
 '''
 
 
@@ -23,7 +27,7 @@ def ma(df, *columns, windows=(20, 30, 50)):
     '''
     for c in columns:
         for w in windows:
-            check_columns(F'{c}_MA_{w}')
+            check_columns(f'{c}_MA_{w}')
             df[f'{c}_MA_{w}'] = df[c].rolling(window=w).mean()
     return df
 
@@ -35,8 +39,8 @@ def exp_ma(df, *columns, windows=(12, 26)):
     '''
     for c in columns:
         for w in windows:
-            check_columns(F'{c}_EMA_{w}')
-            df[F'{c}_EMA_{w}'] = df[c].ewm(span=w).mean()
+            check_columns(f'{c}_EMA_{w}')
+            df[f'{c}_EMA_{w}'] = df[c].ewm(span=w).mean()
     return df
 
 
@@ -46,8 +50,8 @@ def exp_ma(df, *columns, windows=(12, 26)):
 #     Function to calculate moving averages for close price.
 #     '''
 #     for w in windows:
-#         check_columns(F'MA_{w}')
-#         df[F'MA_{w}'] = df['Close'].rolling(window=w).mean()
+#         check_columns(f'MA_{w}')
+#         df[f'MA_{w}'] = df['Close'].rolling(window=w).mean()
 #     return df
 #
 #
@@ -57,8 +61,8 @@ def exp_ma(df, *columns, windows=(12, 26)):
 #     Function to calculate exponential moving averages for close price.
 #     '''
 #     for w in windows:
-#         check_columns(F'EMA_{w}')
-#         df[F'EMA_{w}'] = df['Close'].ewm(span=w).mean()
+#         check_columns(f'EMA_{w}')
+#         df[f'EMA_{w}'] = df['Close'].ewm(span=w).mean()
 #     return df
 
 
@@ -68,11 +72,11 @@ def macd(df, *columns, windows=(12, 26)):
     Default value uses 12 and 26 period ema's
     '''
     for c in columns:
-        check_columns(F'{c}_MACD_{windows[0]}_{windows[1]}')
-        if F'{c}_EMA_{windows[0]}' or F'{c}_EMA_{windows[1]}' not in df:
+        check_columns(f'{c}_MACD_{windows[0]}_{windows[1]}')
+        if f'{c}_EMA_{windows[0]}' or f'{c}_EMA_{windows[1]}' not in df:
             exp_ma(df, c, windows=(windows[0], windows[1]))
-        df[F'{c}_MACD_{windows[0]}_{windows[1]}'] = \
-            df[F'{c}_EMA_{windows[0]}'] - df[F'{c}_EMA_{windows[1]}']
+        df[f'{c}_MACD_{windows[0]}_{windows[1]}'] = \
+            df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
 
 
 def bollinger(df, *columns, windows=(20,)):
@@ -81,14 +85,14 @@ def bollinger(df, *columns, windows=(20,)):
     '''
     for c in columns:
         for w in windows:
-            check_columns(F'{c}_Boll_Upper_{w}', F'{c}_Boll_Lower_{w}')
-            if F'{c}_MA_{w}' or F'{c}_MA_{w}_SD' not in df:
+            check_columns(f'{c}_Boll_Upper_{w}', f'{c}_Boll_Lower_{w}')
+            if f'{c}_MA_{w}' or f'{c}_MA_{w}_SD' not in df:
                 ma(df, 'Close', windows=(w,))
-                std(df, F'{c}_MA_{w}', windows=(w,))
-            df[F'{c}_Boll_Upper_{w}'] = \
-                df[F'{c}_MA_{w}'] + (2 * df[F'{c}_MA_{w}_SD'])
-            df[F'{c}_Boll_Lower_{w}'] = \
-                df[F'{c}_MA_{w}'] - (2 * df[F'{c}_MA_{w}_SD'])
+                std(df, f'{c}_MA_{w}', windows=(w,))
+            df[f'{c}_Boll_Upper_{w}'] = \
+                df[f'{c}_MA_{w}'] + (2 * df[f'{c}_MA_{w}_SD'])
+            df[f'{c}_Boll_Lower_{w}'] = \
+                df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
 
 
 def std(df, *columns, windows=(20,)):
@@ -98,8 +102,24 @@ def std(df, *columns, windows=(20,)):
     '''
     for c in columns:
         for w in windows:
-            check_columns(df, F'{c}_SD')
-            df[F'{c}_SD'] = df[c].rolling(window=w).std()
+            check_columns(df, f'{c}_SD')
+            df[f'{c}_SD'] = df[c].rolling(window=w).std()
+    return df
+
+
+def rsi(df, *columns, windows=(14,)):
+    '''
+    Function to calculate the relative strength index (RSI) of a stock column.
+    Currently calculates for standard moving average.
+    '''
+    for c in columns:
+        for w in windows:
+            delta = df[c].diff()
+            up, down = delta.copy(), delta.copy()
+            up[up < 0], down[down > 0] = 0, 0
+            rs = up.rolling(w).mean() / \
+                 down.abs().rolling(w).mean()
+            df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
     return df
 
 

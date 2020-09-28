@@ -127,6 +127,7 @@ class stock_dataframe():
         default_metrics.macd(self.df, 'Close')
         default_metrics.std(self.df, 'Close_MA_20')
         default_metrics.bollinger(self.df, 'Close')
+        default_metrics.rsi(self.df, 'Close')
         return self.df
 
     def pre_process(self, clean):

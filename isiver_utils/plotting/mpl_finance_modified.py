@@ -8,6 +8,7 @@ standalone module to give greater flexibility in plotting.
 from matplotlib.lines import TICKLEFT, TICKRIGHT, Line2D
 import numpy as np
 
+
 def plot_day_summary_ohlc(ax, quotes, ticksize=3,
                           colorup='k', colordown='r'):
     """Plots day summary
@@ -109,6 +110,7 @@ def _plot_day_summary(ax, quotes, ticksize=3,
     ax.autoscale_view()
 
     return lines
+
 
 def _check_input(opens, closes, highs, lows, miss=-1):
     """Checks that *opens*, *highs*, *lows* and *closes* have the same length.

@@ -65,14 +65,12 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False,
 
     returns list containing fig and ax object(s) for further manipulation
     '''
-
     # Initialise empty lists for fig and ax objects if they need to be returned
     plot_list = []
 
     for stock_class in stock_classes:
         fig, axes = generate_daily_ohlcv(stock_class.df, **kwargs)
         fig.suptitle(stock_class.ticker, color='w')
-
         plot_list.append([fig, axes])
 
         if save_fig == True:
@@ -82,6 +80,7 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False,
             plt.show()
 
     return plot_list
+
 
 def prepare_data(data):
     '''
@@ -104,6 +103,7 @@ def prepare_data(data):
     ohlcv = [[matplotlib_dates[i]] + ohlcv_list[i] for i in range(len(matplotlib_dates))]
 
     return ohlcv
+
 
 def generate_daily_ohlcv(dataframe, up_colour = '#53c156',
                          down_colour='#ff1717', volume_plot='bar', **kwargs):
@@ -134,10 +134,10 @@ def generate_daily_ohlcv(dataframe, up_colour = '#53c156',
 
     # Arrange date labels in a readable way
     plt.setp(ax1.get_xticklabels(), rotation=30, ha='right')
-
     fig, axes = format_plot(fig, axes, **kwargs)
 
     return fig, axes
+
 
 def volume_overlay(ohlcv, ax, volume_plot):
         '''
@@ -161,6 +161,7 @@ def volume_overlay(ohlcv, ax, volume_plot):
 
         return axv
 
+
 def add_indicator_arrow(ax, date, price, text, colour):
     '''
     Adds annotation to supplied axis object
@@ -173,10 +174,10 @@ def add_indicator_arrow(ax, date, price, text, colour):
         text - annotation text
         colour - annotation and arrow colour
     '''
-
     index_num = mdates.date2num(date) # Convert date to number to plot correctly
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)
+
 
 def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
                 ax1_colour='#07000d', spine_colour='#1ABC9C', tick_colour='w',
@@ -184,7 +185,6 @@ def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
     '''
     Use **kwargs to dynamically assign any non-default parameters
     '''
-
     fig.set_size_inches(plot_size)
     fig.set_facecolor(background_colour)
 
