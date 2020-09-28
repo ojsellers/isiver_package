@@ -123,16 +123,6 @@ def rsi(df, *columns, windows=(14,)):
             df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
     return df
 
-
-def check_columns(df, *columns):
-    '''
-    Fn to check if column exists already in dataframe and delete if
-    true
-    '''
-    for column in columns:
-        if column in df:
-            del df[column]
-
 def update_returns(start_date, df):
     '''
     This is used to update the returns column of a dataframe by resampling
