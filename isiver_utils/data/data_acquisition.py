@@ -1,18 +1,4 @@
 '''
-
-HI ISAAC,
-
-I started editing this on Github but going to properly make more changes
-later, probably tomorrow or the day after.
-
-Kind regards,
-
-Ollie
-
-Ollie's To Do:
-- Write generalised rolling metric function
-
-
 Added to Isiver repo on 29/07/2020.
 Script containing stock_dataframe class used to download, clean, and perform
 single stock analysis with.
@@ -25,7 +11,7 @@ from pandas_datareader import data as pdr
 yf.pdr_override()
 import pandas as pd
 from datetime import datetime, timedelta, date
-from isiver_utils.analysis import default_metrics
+from isiver_utils.analysis import metrics
 
 
 class stock_dataframe():
@@ -97,18 +83,6 @@ class stock_dataframe():
         self.df.iat[0, len(self.df.columns) - 1] = 1
         return self.df
 
-    def returns_ma(self, t_frame=50):
-        '''
-        DEPRECATED
-        Function calculates moving averages of
-
-        :param t_frame: number of days over which moving average is taken
-        :return: updated dataframe
-        '''
-        self.check_columns('ReturnsMA')
-        self.df['ReturnsMA'] = self.df['Returns'].rolling(window=t_frame).mean()
-        return self.df
-
     def check_columns(self, *columns):
         '''
         Fn to check if column exists already in dataframe and delete if
@@ -120,14 +94,15 @@ class stock_dataframe():
 
     def get_def_metrics(self):
         '''
-        Function to apply all above metrics to supplied stock dataframe.
+        Function to apply all above metrics to supplied stock dataframe
         '''
-        default_metrics.ma(self.df, 'Close')
-        default_metrics.exp_ma(self.df, 'Close')
-        default_metrics.macd(self.df, 'Close')
-        default_metrics.std(self.df, 'Close_MA_20')
-        default_metrics.bollinger(self.df, 'Close')
-        default_metrics.rsi(self.df, 'Close')
+        print('I don't think all of these should be default metrics')
+        metrics.ma(self.df, 'Close')
+        metrics.exp_ma(self.df, 'Close')
+        metrics.macd(self.df, 'Close')
+        metrics.std(self.df, 'Close_MA_20')
+        metrics.bollinger(self.df, 'Close')
+        metrics.rsi(self.df, 'Close')
         return self.df
 
     def pre_process(self, clean):
