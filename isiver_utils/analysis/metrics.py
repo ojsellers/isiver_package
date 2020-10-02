@@ -4,45 +4,29 @@ Module to provide calculation of default metrics for stock dataframes.
 TODO:
     - Exponential rsi
     - Deltas and mivng avg deltas
+    - Isaac can you update your other metrics so they work with the
+    add_metric_column function in the stock_dataframe class. Feel free to make
+    any edits as you need - I reckon you could whip some kwargs in to pass to
+    the specified metric function for additional parameters
 '''
 
-from isiver_utils.data.data_acquisition import stock_dataframe
 import numpy as np
 import pandas as pd
 
-def get_rolling_metric(df, column, metric, *windows):
-    '''
-    This will be generalised to allow the calculation of
-    a rolling metric over different windows
-    '''
-    pass
-
-
-def ma(df, *columns, windows=(20, 30, 50)):
+def moving_average(df_column, window):
     '''
     Generalised function to calculate and append a moving averages column
 
-    :param column: string name of column to calculate moving averages for
-    :param windows: args int of time windows (days) for moving averages
-            to be calculated over
     '''
-    for c in columns:
-        for w in windows:
-            check_columns(f'{c}_MA_{w}')
-            df[f'{c}_MA_{w}'] = df[c].rolling(window=w).mean()
-    return df
+    return df_column.rolling(window=window).mean()
 
 
-def exp_ma(df, *columns, windows=(12, 26)):
+def exp_moving_average(df_column, window):
     '''
     Generalised function to calculate exponential moving averages for given
     column(s)
     '''
-    for c in columns:
-        for w in windows:
-            check_columns(f'{c}_EMA_{w}')
-            df[f'{c}_EMA_{w}'] = df[c].ewm(span=w).mean()
-    return df
+    return df[c].ewm(span=window).mean()
 
 
 # def close_ma(df, windows=(20, 30, 50)):
@@ -96,16 +80,12 @@ def bollinger(df, *columns, windows=(20,)):
                 df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
 
 
-def std(df, *columns, windows=(20,)):
+def std(df_column, window):
     '''
     Function to calculate standard deviation of given column(s), over specified
     window.
     '''
-    for c in columns:
-        for w in windows:
-            check_columns(df, f'{c}_SD')
-            df[f'{c}_SD'] = df[c].rolling(window=w).std()
-    return df
+    return df_column.rolling(window=window).std()
 
 
 def rsi(df, *columns, windows=(14,)):
@@ -123,30 +103,15 @@ def rsi(df, *columns, windows=(14,)):
             df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
     return df
 
-def update_returns(start_date, df):
-    '''
-    This is used to update the returns column of a dataframe by resampling
-    from a specified date using the stock_dataframe class. This is mainly used
-    so ISF_L and GLTS_L databases can be resized for comparison with stocks
-    having different time frames
-
-    :param start_date: is the date from which resampling should be done
-    :param df: dataframe on which recalculating should be performed
-    :return: resampled dataframe
-    '''
-    return stock_dataframe('',None,df[df.index>=start_date]).pre_process(False)
-
-
-def risk_free_rate(start_date, risk_free_df):
+def risk_free_rate(risk_free_df):
     '''
     This returns the risk free rate for a specified risk free stock dataframe
 
-    :param start_date: date to calculate risk free rate from
-    :param risk_free_df: risk free stock dataframe with 'Returns' column to be
-            updated from specified start date
+    :param risk_free_df: risk free stock dataframe with 'Returns' same length
+                as base_df
     :return: float return rate from specified start date
     '''
-    return (update_returns(start_date, risk_free_df)['Returns']).tail(1) - 1
+    return (risk_free_df['Returns']).tail(1) - 1
 
 
 def covariance(df, base):
@@ -201,18 +166,16 @@ def sharpes(df, rf=0.01):
     return (((df['Returns'].tail(1) - 1) - rf) / np.std(df['Returns'])).iloc[0]
 
 
-def get_return_metrics(df, start_date, base_df, risk_free_df):
+def get_return_metrics(df, base_df, risk_free_df):
     '''
     Function to get all above metrics: sharpes, alpha, and beta
+    Have to ensure returns column in risk_free_df and base_df have the same
+    length returns column using the in-class resample_returns col
 
     :param df: stock dataframe of interest
-    :param start_date: start date to calculate metrics from
     :param base_df: baseline stock dataframe (e.g. FTSE 100 tracker)
     :param risk_free_df: risk free stock dataframe (e.g. government bonds)
     '''
-    if not start_date:
-        start_date = df.head(1).index[0]
-    rf = risk_free_rate(start_date, risk_free_df)
-    base = update_returns(start_date, base_df)['Returns']
-    beta_value = beta(covariance(df, base))
-    return beta_value, alpha(df, beta_value, rf, base), sharpes(df, rf)
+    rf = risk_free_rate(risk_free_df)
+    beta_value = beta(covariance(df, base_df['Returns']))
+    return beta_value, alpha(df, beta_value, rf, base_df['Returns']), sharpes(df, rf)
