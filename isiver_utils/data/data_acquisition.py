@@ -83,6 +83,36 @@ class stock_dataframe():
         self.df.iat[0, len(self.df.columns) - 1] = 1
         return self.df
 
+    def get_default_metrics(self):
+        '''
+        Function to apply all above metrics to supplied stock dataframe
+        '''
+        self.add_metric_column(metrics.moving_average, ['Returns', 'Close'],
+                                (30,50), 'MA')
+        self.add_metric_column(metrics.moving_average, ['Close'], (30,50), 'EMA')
+        # metrics.macd(self.df, 'Close')
+        # metrics.std(self.df, 'Close_MA_20')
+        # metrics.bollinger(self.df, 'Close')
+        # metrics.rsi(self.df, 'Close')
+        return self.df
+
+    def add_metric_column(self, metric, columns, windows, metric_col_name):
+        '''
+        Generalised function to add columns to the dataframe based on a
+        specified function
+
+        :param metric: metric from metrics file e.g. metric.moving_average
+        :param columns: list of column names to apply to
+        :param windows: tuple of windows to calculate metric over
+        :param metric_col_name: abreviation to be added to col name in df
+                        e.g. 'MA''
+        '''
+        for c in columns:
+            for w in windows:
+                self.check_columns(f'{c}_{metric_col_name}_{w}')
+                self.df[f'{c}_{metric_col_name}_{w}'] = metric(self.df[c], w)
+        return self.df
+
     def check_columns(self, *columns):
         '''
         Fn to check if column exists already in dataframe and delete if
@@ -91,40 +121,47 @@ class stock_dataframe():
         for column in columns:
             if column in self.df:
                 del self.df[column]
-
-    def get_def_metrics(self):
-        '''
-        Function to apply all above metrics to supplied stock dataframe
-        '''
-        print('I don't think all of these should be default metrics')
-        print('I reckon we should get these functions to return a series and assign that series to a column in-class. Also, we can then only send the function one column rather than the df and a column name')
-        metrics.ma(self.df, 'Close')
-        metrics.exp_ma(self.df, 'Close')
-        metrics.macd(self.df, 'Close')
-        metrics.std(self.df, 'Close_MA_20')
-        metrics.bollinger(self.df, 'Close')
-        metrics.rsi(self.df, 'Close')
         return self.df
 
     def pre_process(self, clean):
+        '''
+        Function to preprocess a dataframe by cleaning and calculating default
+        metrics
+
+        :param clean: bool True for clean
+        '''
         if clean:
             self.clean_data()
         self.returns()
-        self.returns_ma()
-        self.get_def_metrics()
+        self.get_default_metrics()
         return self.df
 
     def new_stock_df(self):
+        '''
+        Function to grab a new stock dataframe with default metrics
+        '''
         self.download_data()
         return self.pre_process(True)
 
     def update_stock_df(self):
         '''
-        Updates stock dataframe to include up to date prices,
-        doesn't update metrics columns so get_metrics must be
-        called
+        Updates a current stock dataframe to up-to-date prices and recalcs
+        default metrics
         '''
         old_df = self.df.copy()
         self.download_data()
         self.df = pd.concat([old_df, self.df])
         return self.pre_process(True)
+
+    def resample_returns(self, start_date, df):
+        '''
+        This is used to update the returns column of a dataframe by resampling
+        from a specified date for comparing returns with other stock dataframes.
+        To be passed to returns metric functions directly so copies without
+        changing original dataframe
+
+        :param start_date: is the date from which resampling should be done
+        :param df: dataframe on which recalculating should be performed
+        :return: resampled dataframe
+        '''
+        return stock_dataframe('',None,df[df.index>=start_date]).pre_process(False)
