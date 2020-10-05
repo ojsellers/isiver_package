@@ -1,7 +1,7 @@
 '''
 Added to Isiver repo on 29/07/2020.
-Script containing stock_dataframe class used to download, clean, and perform
-single stock analysis with.
+Script containing stock_dataframe class used to download, clean, and calculate
+metrics within metrics file to add to dataframe.
 Limitations of yfinance API are that prices for some stock codes are lacking in
 places and intraday frequency is not possible for download periods of >60 days.
 '''
