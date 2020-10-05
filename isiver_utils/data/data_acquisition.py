@@ -92,7 +92,7 @@ class stock_dataframe():
         self.add_metric_column(metrics.exp_moving_average, ['Close'], (30,50), 'EMA')
         self.add_metric_column(metrics.std, ['Close'], (12,26), 'std')
         self.add_metric_column(metrics.rsi, ['Close'], (14,), 'RSI')
-        # metrics.macd(self.df, 'Close')
+        self.add_metric_column(metrics.macd, ['Close'], ((12, 26),), 'MACD')
         # metrics.bollinger(self.df, 'Close')
         return self.df
 
@@ -109,8 +109,9 @@ class stock_dataframe():
         '''
         for c in columns:
             for w in windows:
-                self.check_columns(f'{c}_{metric_col_name}_{w}')
-                self.df[f'{c}_{metric_col_name}_{w}'] = metric(self.df[c], w)
+                w_str = str(w) if type(w)==int else f'{w[0]}_{w[1]}'
+                self.check_columns(f'{c}_{metric_col_name}_{w_str}')
+                self.df[f'{c}_{metric_col_name}_{w_str}'] = metric(self.df[c], w)
         return self.df
 
     def check_columns(self, *columns):

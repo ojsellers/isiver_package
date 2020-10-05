@@ -51,28 +51,14 @@ def rsi(df_column, window):
     return 100.0 - (100.0 / (1.0 + rs))
 
 
-# def macd(df_column, window):
-#     '''
-#     Function to add moving average convergence divergence column to df.
-#     Default value uses 12 and 26 period ema's
-#     '''
-#     if f'{c}_EMA_{window[0]}' or f'{c}_EMA_{window[1]}' not in df:
-#         sys.exit(f'METRIC ERROR: {window[0]}-{window[0]} MACD missing required \
-#                 EMA columns')
-#     return df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
-
-
-def macd(df, *columns, windows=(12, 26)):
+def macd(df_column, window):
     '''
-    Function to add moving average convergence divergence column to df.
-    Default value uses 12 and 26 period ema's
+    Function to add moving average convergence divergence for given column to
+    df.
     '''
-    for c in columns:
-        check_columns(f'{c}_MACD_{windows[0]}_{windows[1]}')
-        if f'{c}_EMA_{windows[0]}' or f'{c}_EMA_{windows[1]}' not in df:
-            exp_ma(df, c, windows=(windows[0], windows[1]))
-        df[f'{c}_MACD_{windows[0]}_{windows[1]}'] = \
-            df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
+    ema_1 = exp_moving_average(df_column, window[0])
+    ema_2 = exp_moving_average(df_column, window[1])
+    return ema_1 - ema_2
 
 
 def bollinger(df, *columns, windows=(20,)):
