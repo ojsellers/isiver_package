@@ -51,44 +51,6 @@ def rsi(df_column, window):
     return 100.0 - (100.0 / (1.0 + rs))
 
 
-# def rsi(df, *columns, windows=(14,)):
-#     '''
-#     Function to calculate the relative strength index (RSI) of a stock column.
-#     Currently calculates for standard moving average.
-#     '''
-#     for c in columns:
-#         for w in windows:
-#             delta = df[c].diff()
-#             up, down = delta.copy(), delta.copy()
-#             up[up < 0], down[down > 0] = 0, 0
-#             rs = up.rolling(w).mean() / \
-#                  down.abs().rolling(w).mean()
-#             df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
-#     return df
-
-
-# def close_ma(df, windows=(20, 30, 50)):
-#     '''
-#     DEPRECATED
-#     Function to calculate moving averages for close price.
-#     '''
-#     for w in windows:
-#         check_columns(f'MA_{w}')
-#         df[f'MA_{w}'] = df['Close'].rolling(window=w).mean()
-#     return df
-#
-#
-# def close_exp_ma(df, windows=(12, 26)):
-#     '''
-#     DEPRECATED
-#     Function to calculate exponential moving averages for close price.
-#     '''
-#     for w in windows:
-#         check_columns(f'EMA_{w}')
-#         df[f'EMA_{w}'] = df['Close'].ewm(span=w).mean()
-#     return df
-
-
 # def macd(df_column, window):
 #     '''
 #     Function to add moving average convergence divergence column to df.
@@ -98,6 +60,7 @@ def rsi(df_column, window):
 #         sys.exit(f'METRIC ERROR: {window[0]}-{window[0]} MACD missing required \
 #                 EMA columns')
 #     return df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
+
 
 def macd(df, *columns, windows=(12, 26)):
     '''
