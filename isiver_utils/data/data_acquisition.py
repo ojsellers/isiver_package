@@ -99,7 +99,7 @@ class stock_dataframe():
     def add_metric_column(self, metric, columns, windows, metric_col_name):
         '''
         Generalised function to add columns to the dataframe based on a
-        specified function
+        specified metric function
 
         :param metric: metric from metrics file e.g. metric.moving_average
         :param columns: list of column names to apply to
