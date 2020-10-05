@@ -89,11 +89,8 @@ class stock_dataframe():
         '''
         self.add_metric_column(metrics.moving_average, ['Returns', 'Close'],
                                 (30,50), 'MA')
-        self.add_metric_column(metrics.moving_average, ['Close'], (30,50), 'EMA')
-        # metrics.macd(self.df, 'Close')
-        # metrics.std(self.df, 'Close_MA_20')
-        # metrics.bollinger(self.df, 'Close')
-        # metrics.rsi(self.df, 'Close')
+        self.add_metric_column(metrics.exp_moving_average, ['Close'], (30,50), 'EMA')
+
         return self.df
 
     def add_metric_column(self, metric, columns, windows, metric_col_name):

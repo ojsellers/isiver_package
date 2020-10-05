@@ -12,6 +12,7 @@ TODO:
 
 import numpy as np
 import pandas as pd
+import sys
 
 def moving_average(df_column, window):
     '''
@@ -26,7 +27,15 @@ def exp_moving_average(df_column, window):
     Generalised function to calculate exponential moving averages for given
     column(s)
     '''
-    return df[c].ewm(span=window).mean()
+    return df_column.ewm(span=window).mean()
+
+
+def std(df_column, window):
+    '''
+    Function to calculate standard deviation of given column(s), over specified
+    window.
+    '''
+    return df_column.rolling(window=window).std()
 
 
 # def close_ma(df, windows=(20, 30, 50)):
@@ -78,14 +87,6 @@ def bollinger(df, *columns, windows=(20,)):
                 df[f'{c}_MA_{w}'] + (2 * df[f'{c}_MA_{w}_SD'])
             df[f'{c}_Boll_Lower_{w}'] = \
                 df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
-
-
-def std(df_column, window):
-    '''
-    Function to calculate standard deviation of given column(s), over specified
-    window.
-    '''
-    return df_column.rolling(window=window).std()
 
 
 def rsi(df, *columns, windows=(14,)):
