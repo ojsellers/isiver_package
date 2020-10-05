@@ -91,7 +91,7 @@ class stock_dataframe():
                                 (30,50), 'MA')
         self.add_metric_column(metrics.exp_moving_average, ['Close'], (30,50), 'EMA')
         self.add_metric_column(metrics.std, ['Close'], (12,26), 'std')
-        self.add_metric_column(metrics.rsi, ['Close'], (14), 'RSI')
+        self.add_metric_column(metrics.rsi, ['Close'], (14,), 'RSI')
 
         # self.add_metric_column(metrics.macd, ['Close'], (12,26), 'MACD')
 
