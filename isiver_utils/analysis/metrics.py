@@ -38,6 +38,35 @@ def std(df_column, window):
     return df_column.rolling(window=window).std()
 
 
+def rsi(df_column, window):
+    '''
+    Function to calculate the relative strength index (RSI) of a stock column.
+    Currently calculates for standard moving average.
+    '''
+    delta = df_column.diff()
+    up, down = delta.copy(), delta.copy()
+    up[up < 0], down[down > 0] = 0, 0
+    rs = up.rolling(w).mean() / \
+         down.abs().rolling(w).mean()
+    return 100.0 - (100.0 / (1.0 + rs))
+
+
+def rsi(df, *columns, windows=(14,)):
+    '''
+    Function to calculate the relative strength index (RSI) of a stock column.
+    Currently calculates for standard moving average.
+    '''
+    for c in columns:
+        for w in windows:
+            delta = df[c].diff()
+            up, down = delta.copy(), delta.copy()
+            up[up < 0], down[down > 0] = 0, 0
+            rs = up.rolling(w).mean() / \
+                 down.abs().rolling(w).mean()
+            df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
+    return df
+
+
 # def close_ma(df, windows=(20, 30, 50)):
 #     '''
 #     DEPRECATED
@@ -98,21 +127,6 @@ def bollinger(df, *columns, windows=(20,)):
             df[f'{c}_Boll_Lower_{w}'] = \
                 df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
 
-
-def rsi(df, *columns, windows=(14,)):
-    '''
-    Function to calculate the relative strength index (RSI) of a stock column.
-    Currently calculates for standard moving average.
-    '''
-    for c in columns:
-        for w in windows:
-            delta = df[c].diff()
-            up, down = delta.copy(), delta.copy()
-            up[up < 0], down[down > 0] = 0, 0
-            rs = up.rolling(w).mean() / \
-                 down.abs().rolling(w).mean()
-            df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
-    return df
 
 def risk_free_rate(risk_free_df):
     '''
