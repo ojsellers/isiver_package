@@ -60,6 +60,16 @@ def std(df_column, window):
 #     return df
 
 
+# def macd(df_column, window):
+#     '''
+#     Function to add moving average convergence divergence column to df.
+#     Default value uses 12 and 26 period ema's
+#     '''
+#     if f'{c}_EMA_{window[0]}' or f'{c}_EMA_{window[1]}' not in df:
+#         sys.exit(f'METRIC ERROR: {window[0]}-{window[0]} MACD missing required \
+#                 EMA columns')
+#     return df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
+
 def macd(df, *columns, windows=(12, 26)):
     '''
     Function to add moving average convergence divergence column to df.
