@@ -4,10 +4,6 @@ Module to provide calculation of default metrics for stock dataframes.
 TODO:
     - Exponential rsi
     - Deltas and mivng avg deltas
-    - Isaac can you update your other metrics so they work with the
-    add_metric_column function in the stock_dataframe class. Feel free to make
-    any edits as you need - I reckon you could whip some kwargs in to pass to
-    the specified metric function for additional parameters
 '''
 
 import numpy as np
@@ -61,20 +57,16 @@ def macd(df_column, window):
     return ema_1 - ema_2
 
 
-def bollinger(df, *columns, windows=(20,)):
+def bollinger(df_column, window, bound='Upper'):
     '''
-    Fn to calculate upper and lower bollinger bands for stock close price
+    Fn to calculate upper and lower bollinger bands for given column
     '''
-    for c in columns:
-        for w in windows:
-            check_columns(f'{c}_Boll_Upper_{w}', f'{c}_Boll_Lower_{w}')
-            if f'{c}_MA_{w}' or f'{c}_MA_{w}_SD' not in df:
-                ma(df, 'Close', windows=(w,))
-                std(df, f'{c}_MA_{w}', windows=(w,))
-            df[f'{c}_Boll_Upper_{w}'] = \
-                df[f'{c}_MA_{w}'] + (2 * df[f'{c}_MA_{w}_SD'])
-            df[f'{c}_Boll_Lower_{w}'] = \
-                df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
+    ma = moving_average(df_column, window)
+    sd = std(df_column, window)
+    if bound == 'Upper':
+        return ma + (2 * sd)
+    elif bound == 'Lower':
+        return ma - (2 * sd)
 
 
 def risk_free_rate(risk_free_df):
