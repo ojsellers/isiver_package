@@ -15,6 +15,8 @@ TODO
     - put functions in another script
     - check how many times we assign facecolor
     - rename to ohlcv_daily
+    - fix kwarg output_window and save_fig issue
+    - add macd subplot
 
 '''
 
@@ -28,6 +30,7 @@ import matplotlib.ticker as mticker
 import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
 from isiver_utils.plotting import mpl_finance_modified as mpf
+import formatting
 
 # Default plot save directory *********temp************
 default_plot_dir = os.getcwd() + '/plots/'
@@ -69,7 +72,7 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
         fig, ohlcv_ax = generate_fig_ax()                                       # CREATE SUBPLOT AXES HERE WITH CONDITIONAL AND KWARGS
         generate_daily_ohlcv(stock_class.df, fig, ohlcv_ax, **kwargs)
         volume_ax = plot_volume(stock_class.df, ohlcv_ax, **kwargs)
-        format_plot(fig, stock_class.ticker, **kwargs)
+        formatting.format_plot(fig, stock_class.ticker, **kwargs)
         plot_list.append([fig])
         process_fig(**kwargs)
 
@@ -169,47 +172,3 @@ def add_indicator_arrow(ax, date, price, text, colour):
     index_num = mdates.date2num(date) # Convert date to number to plot correctly
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)
-
-
-def format_plot(fig, ticker, **kwargs):
-    '''
-    Wrapper function to call formatting functions on figure and axes
-    '''
-    format_fig(fig, ticker, **kwargs)
-    format_axes(fig, **kwargs)
-    format_ohlcv(fig.axes[0])
-
-
-def format_fig(fig, ticker, plot_size=(14, 9), background_colour='#07000d'):
-    '''
-    Format figure titles, colour and plot size
-    '''
-    fig.suptitle(ticker, color='w')
-    fig.set_size_inches(plot_size)
-    fig.set_facecolor(background_colour)
-    plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(prune='upper'))
-
-
-def format_axes(fig, ax_colour='#07000d', spine_colour='#1ABC9C',
-                tick_colour='w', max_dticks=30):
-    '''
-    Fn to format ax objects in fig
-    '''
-    for ax in fig.axes:
-        ax.set_facecolor(ax_colour)
-        plt.setp(ax.get_xticklabels(), rotation=30, ha='right') #readable labels
-        plt.setp(ax.spines.values(), color=spine_colour)
-        ax.tick_params(colors=tick_colour)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        ax.xaxis.set_major_locator(mticker.MaxNLocator(max_dticks))
-    return fig
-
-
-def format_ohlcv(ax):
-    '''
-    Format OHLCV axes colour and labels
-    '''
-    # OHLC main price chart
-    ax.grid(True, color='w', linewidth=0.5, linestyle=':')
-    ax.set_ylabel('Stock Price (GBP)', color='w')
-    ax.set_xlabel('Date', color='w')
