@@ -32,6 +32,7 @@ from isiver_utils.plotting import mpl_finance_modified as mpf
 # Default plot save directory *********temp************
 default_plot_dir = os.getcwd() + '/plots/'
 
+
 def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
     '''
     Wrapper function for daily OHLC graph, with volume data overlay.
@@ -58,7 +59,7 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
         save_fig - toggle if matplotlib saves plot
         save_dir - directory to save plot in
 
-    returns list containing fig and ax object(s) for further manipulation
+    returns list containing fig object(s)
     '''
     # Initialise empty lists for fig objects if they need to be returned
     plot_list = []
@@ -112,13 +113,8 @@ def generate_daily_ohlcv(stock_df, fig, ohlcv_ax, up_colour='#53c156',
     Generate daily ohlcv fig and ax objects with modified mpl-finance module
     '''
     ohlcv = prepare_ohlcv_list(stock_df)
-    # Check and add initial data to plot
     mpf.plot_day_summary_ohlc(ohlcv_ax, ohlcv, ticksize = 3, colorup=up_colour,
                               colordown=down_colour)
-    # format_ohlcv(ohlcv_ax)
-
-    # # Apply volume overlay
-    # axes = plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot)
     return fig, ohlcv_ax
 
 
