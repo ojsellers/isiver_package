@@ -9,8 +9,12 @@ TODO
     CAN HOLD SAME DYNAMIC FUNCTIONALITY WE HAVE HERE
     - Add close/adjusted close parameter
     - update to use test_data functionality in data_acquisition
-    - come up with sensble formatting methods as we currently have multiple
-    scattered functions
+    - check all kwargs
+    - subfunction subplot generation
+    - make main plot a different size dependng on chosen plots
+    - put functions in another script
+    - check how many times we assign facecolor
+    - rename to ohlcv_daily
 
 '''
 
@@ -25,7 +29,7 @@ import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
 from isiver_utils.plotting import mpl_finance_modified as mpf
 
-# Default plot save directory
+# Default plot save directory *********temp************
 default_plot_dir = os.getcwd() + '/plots/'
 
 def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
@@ -46,7 +50,7 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
         background_colour - fig background colour
         up_colour - up bar colour
         down_colour - down bar colour
-        ax1_colour - background of main plot
+        ax_colour - background of main plot
         spine_colour - colour of all spines in plot
         tick_colour - X/Y tick colour
         max_dticks - assign maximum number of date ticks on bottom axis for readability
@@ -56,18 +60,16 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
 
     returns list containing fig and ax object(s) for further manipulation
     '''
-    # Initialise empty lists for fig and ax objects if they need to be returned
+    # Initialise empty lists for fig objects if they need to be returned
     plot_list = []
 
-    for stock_class in stock_classes:
+    for stock_class in stock_classes:                                           # REORDER AS NECESSARY - Make sure following functions are in order called
         format_dates(stock_class.df)
-        fig, ohlcv_ax = generate_fig_ax()                                             # CREATE SUBPLOT AXES HERE WITH CONDITIONAL AND KWARGS
-        fig, axes = generate_daily_ohlcv(stock_class.df, fig, ohlcv_ax, **kwargs)
-        fig, axes = format_plot(fig, axes, **kwargs)
-        print(fig.axes[0])
-        add_subplots(stock_class.df, axes)
-        fig.suptitle(stock_class.ticker, color='w')
-        plot_list.append([fig, axes])
+        fig, ohlcv_ax = generate_fig_ax()                                       # CREATE SUBPLOT AXES HERE WITH CONDITIONAL AND KWARGS
+        generate_daily_ohlcv(stock_class.df, fig, ohlcv_ax, **kwargs)
+        volume_ax = plot_volume(stock_class.df, ohlcv_ax, **kwargs)
+        format_plot(fig, stock_class.ticker, **kwargs)
+        plot_list.append([fig])
         process_fig(**kwargs)
 
     return plot_list
@@ -80,9 +82,6 @@ def generate_fig_ax():
     # Create figure and specify dimensions
     fig = plt.figure() # create figure
     ax = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, fig=fig)
-    # if macd_plot == True:
-    #     ax_macd = plt.subplot2grid((6,4), (5,0), sharex=ax, rowspan=1,
-    #                                 colspan=4, facecolor='#07000d')
     return fig, ax
 
 
@@ -116,19 +115,11 @@ def generate_daily_ohlcv(stock_df, fig, ohlcv_ax, up_colour='#53c156',
     # Check and add initial data to plot
     mpf.plot_day_summary_ohlc(ohlcv_ax, ohlcv, ticksize = 3, colorup=up_colour,
                               colordown=down_colour)
-    format_ohlcv(ohlcv_ax)
+    # format_ohlcv(ohlcv_ax)
 
-    # Apply volume overlay
-    axes = plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot)
-    return fig, axes
-
-
-def format_ohlcv(ax):
-
-    # OHLC main price chart
-    ax.grid(True, color='w', linewidth=0.5, linestyle=':')
-    plt.ylabel('Stock Price (GBP)', color='w')
-    ax.set_xlabel('Date', color='w')
+    # # Apply volume overlay
+    # axes = plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot)
+    return fig, ohlcv_ax
 
 
 def prepare_ohlcv_list(stock_df):
@@ -142,10 +133,11 @@ def prepare_ohlcv_list(stock_df):
     return ohlcv
 
 
-def plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot):
+def plot_volume(stock_df, ohlcv_ax, volume_plot='bar'):
     '''
-    Function to overlay volume on price plot
+    Function to overlay volume on OHLCV price plot
     '''
+    ohlcv = prepare_ohlcv_list(stock_df)
     if volume_plot != 'off':
         volumeMin = 0
         volume_data = [line[5] for line in ohlcv]
@@ -162,28 +154,8 @@ def plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot):
         # Set max bar height lower than ohlc markers for ease of viewing
         volume_ax.set_ylim(0, 4*max(volume_data))
         volume_ax.set_ylabel('Volume', color='w')
-        return [ohlcv_ax, volume_ax]
-    return [ohlcv_ax]
-
-
-def add_subplots(stock_df, axes, macd_plot='on'):
-    x = 1
-    # # Apply volume overlay
-    # if macd_plot != 'off':
-    #     axes = axes + [plot_macd(stock_df, axes[0], macd_plot)]
-
-
-# def plot_macd(stock_df, ax, macd_plot):
-#
-#     ax_macd = plt.subplot2grid((6,4), (5,0), sharex=ax, rowspan=1, colspan=4,
-#                             facecolor='#07000d')
-#     ax_macd.plot(stock_df['Date'], stock_df['Close_MACD_12_26'], color='#4ee6fd', lw=2)
-#     # ax_macd.plot([line[0] for line in stock_dataframe], stock_df['Close_MACD_12_26'], color='#e1edf9', lw=1)
-#
-#
-#
-#     print('reached')
-#     return ax_macd
+        return volume_ax
+    return ohlcv_ax
 
 
 def add_indicator_arrow(ax, date, price, text, colour):
@@ -202,22 +174,46 @@ def add_indicator_arrow(ax, date, price, text, colour):
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)
 
-def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
-                ax1_colour='#07000d', spine_colour='#1ABC9C', tick_colour='w',
-                max_dticks=30):
+
+def format_plot(fig, ticker, **kwargs):
     '''
-    Use **kwargs to dynamically assign any non-default parameters
+    Wrapper function to call formatting functions on figure and axes
     '''
-    plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(prune='upper'))
+    format_fig(fig, ticker, **kwargs)
+    format_axes(fig, **kwargs)
+    format_ohlcv(fig.axes[0])
+
+
+def format_fig(fig, ticker, plot_size=(14, 9), background_colour='#07000d'):
+    '''
+    Format figure titles, colour and plot size
+    '''
+    fig.suptitle(ticker, color='w')
     fig.set_size_inches(plot_size)
     fig.set_facecolor(background_colour)
+    plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(prune='upper'))
 
-    for ax in axes:
-        ax.set_facecolor(ax1_colour)
+
+def format_axes(fig, ax_colour='#07000d', spine_colour='#1ABC9C',
+                tick_colour='w', max_dticks=30):
+    '''
+    Fn to format ax objects in fig
+    '''
+    for ax in fig.axes:
+        ax.set_facecolor(ax_colour)
         plt.setp(ax.get_xticklabels(), rotation=30, ha='right') #readable labels
         plt.setp(ax.spines.values(), color=spine_colour)
         ax.tick_params(colors=tick_colour)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         ax.xaxis.set_major_locator(mticker.MaxNLocator(max_dticks))
+    return fig
 
-    return fig, axes
+
+def format_ohlcv(ax):
+    '''
+    Format OHLCV axes colour and labels
+    '''
+    # OHLC main price chart
+    ax.grid(True, color='w', linewidth=0.5, linestyle=':')
+    ax.set_ylabel('Stock Price (GBP)', color='w')
+    ax.set_xlabel('Date', color='w')
