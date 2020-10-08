@@ -61,9 +61,10 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
 
     for stock_class in stock_classes:
         format_dates(stock_class.df)
-        fig, ax = generate_fig_ax()                                             # CREATE SUBPLOT AXES HERE WITH CONDITIONAL AND KWARGS
-        fig, axes = generate_daily_ohlcv(stock_class.df, fig, ax, **kwargs)
+        fig, ohlcv_ax = generate_fig_ax()                                             # CREATE SUBPLOT AXES HERE WITH CONDITIONAL AND KWARGS
+        fig, axes = generate_daily_ohlcv(stock_class.df, fig, ohlcv_ax, **kwargs)
         fig, axes = format_plot(fig, axes, **kwargs)
+        print(fig.axes[0])
         add_subplots(stock_class.df, axes)
         fig.suptitle(stock_class.ticker, color='w')
         plot_list.append([fig, axes])
@@ -78,7 +79,10 @@ def generate_fig_ax():
     '''
     # Create figure and specify dimensions
     fig = plt.figure() # create figure
-    ax = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4) # assign axis
+    ax = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, fig=fig)
+    # if macd_plot == True:
+    #     ax_macd = plt.subplot2grid((6,4), (5,0), sharex=ax, rowspan=1,
+    #                                 colspan=4, facecolor='#07000d')
     return fig, ax
 
 
@@ -103,18 +107,19 @@ def process_fig(save_fig=False, save_dir=default_plot_dir, output_window=True):
         plt.show()
 
 
-def generate_daily_ohlcv(dataframe, fig, ax1, up_colour='#53c156',
+def generate_daily_ohlcv(stock_df, fig, ohlcv_ax, up_colour='#53c156',
                          down_colour='#ff1717', volume_plot='bar', **kwargs):
     '''
     Generate daily ohlcv fig and ax objects with modified mpl-finance module
     '''
-    ohlcv = prepare_ohlcv_list(dataframe)
+    ohlcv = prepare_ohlcv_list(stock_df)
     # Check and add initial data to plot
-    mpf.plot_day_summary_ohlc(ax1, ohlcv, ticksize = 3, colorup=up_colour,
+    mpf.plot_day_summary_ohlc(ohlcv_ax, ohlcv, ticksize = 3, colorup=up_colour,
                               colordown=down_colour)
-    format_ohlcv(ax1)
+    format_ohlcv(ohlcv_ax)
+
     # Apply volume overlay
-    axes = plot_volume_overlay(ohlcv, [ax1], volume_plot)
+    axes = plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot)
     return fig, axes
 
 
@@ -137,7 +142,7 @@ def prepare_ohlcv_list(stock_df):
     return ohlcv
 
 
-def plot_volume_overlay(ohlcv, axes, volume_plot):
+def plot_volume_overlay(ohlcv, ohlcv_ax, volume_plot):
     '''
     Function to overlay volume on price plot
     '''
@@ -145,20 +150,20 @@ def plot_volume_overlay(ohlcv, axes, volume_plot):
         volumeMin = 0
         volume_data = [line[5] for line in ohlcv]
         dates = [line[0] for line in ohlcv]
-        ax_v = axes[0].twinx()
+        volume_ax = ohlcv_ax.twinx()
 
         if volume_plot == 'bar':
-            ax_v.bar(dates, volume_data, color='#1ABC9C', alpha=.3)
+            volume_ax.bar(dates, volume_data, color='#1ABC9C', alpha=.3)
 
         if volume_plot == 'fill':
-            ax_v.fill_between(dates, volumeMin, volume_data, facecolor='#1ABC9C',
+            volume_ax.fill_between(dates, volumeMin, volume_data, facecolor='#1ABC9C',
                              alpha=.3)
 
         # Set max bar height lower than ohlc markers for ease of viewing
-        ax_v.set_ylim(0, 4*max(volume_data))
-        ax_v.set_ylabel('Volume', color='w')
-        return axes + [ax_v]
-    return axes
+        volume_ax.set_ylim(0, 4*max(volume_data))
+        volume_ax.set_ylabel('Volume', color='w')
+        return [ohlcv_ax, volume_ax]
+    return [ohlcv_ax]
 
 
 def add_subplots(stock_df, axes, macd_plot='on'):
@@ -196,8 +201,6 @@ def add_indicator_arrow(ax, date, price, text, colour):
     index_num = mdates.date2num(date) # Convert date to number to plot correctly
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)
-
-# def add_titles():
 
 def format_plot(fig, axes, plot_size=(14, 9), background_colour='#07000d',
                 ax1_colour='#07000d', spine_colour='#1ABC9C', tick_colour='w',
