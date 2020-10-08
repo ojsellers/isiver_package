@@ -9,6 +9,9 @@ TODO
     CAN HOLD SAME DYNAMIC FUNCTIONALITY WE HAVE HERE
     - Add close/adjusted close parameter
     - update to use test_data functionality in data_acquisition
+    - come up with sensble formatting methods as we currently have multiple
+    scattered functions
+
 '''
 
 import pickle
@@ -114,12 +117,14 @@ def generate_daily_ohlcv(dataframe, fig, ax1, up_colour='#53c156',
     axes = plot_volume_overlay(ohlcv, [ax1], volume_plot)
     return fig, axes
 
+
 def format_ohlcv(ax):
 
     # OHLC main price chart
     ax.grid(True, color='w', linewidth=0.5, linestyle=':')
     plt.ylabel('Stock Price (GBP)', color='w')
     ax.set_xlabel('Date', color='w')
+
 
 def prepare_ohlcv_list(stock_df):
     '''
