@@ -2,8 +2,6 @@ numpy
 pandas
 matplotlib
 yfinance
-mplfinance
 datetime
 pandas_datareader
 scipy
-pickle

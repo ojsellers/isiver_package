@@ -4,14 +4,11 @@ Module to provide calculation of default metrics for stock dataframes.
 TODO:
     - Exponential rsi
     - Deltas and mivng avg deltas
-    - Isaac can you update your other metrics so they work with the
-    add_metric_column function in the stock_dataframe class. Feel free to make
-    any edits as you need - I reckon you could whip some kwargs in to pass to
-    the specified metric function for additional parameters
 '''
 
 import numpy as np
 import pandas as pd
+import sys
 
 def moving_average(df_column, window):
     '''
@@ -26,58 +23,7 @@ def exp_moving_average(df_column, window):
     Generalised function to calculate exponential moving averages for given
     column(s)
     '''
-    return df[c].ewm(span=window).mean()
-
-
-# def close_ma(df, windows=(20, 30, 50)):
-#     '''
-#     DEPRECATED
-#     Function to calculate moving averages for close price.
-#     '''
-#     for w in windows:
-#         check_columns(f'MA_{w}')
-#         df[f'MA_{w}'] = df['Close'].rolling(window=w).mean()
-#     return df
-#
-#
-# def close_exp_ma(df, windows=(12, 26)):
-#     '''
-#     DEPRECATED
-#     Function to calculate exponential moving averages for close price.
-#     '''
-#     for w in windows:
-#         check_columns(f'EMA_{w}')
-#         df[f'EMA_{w}'] = df['Close'].ewm(span=w).mean()
-#     return df
-
-
-def macd(df, *columns, windows=(12, 26)):
-    '''
-    Function to add moving average convergence divergence column to df.
-    Default value uses 12 and 26 period ema's
-    '''
-    for c in columns:
-        check_columns(f'{c}_MACD_{windows[0]}_{windows[1]}')
-        if f'{c}_EMA_{windows[0]}' or f'{c}_EMA_{windows[1]}' not in df:
-            exp_ma(df, c, windows=(windows[0], windows[1]))
-        df[f'{c}_MACD_{windows[0]}_{windows[1]}'] = \
-            df[f'{c}_EMA_{windows[0]}'] - df[f'{c}_EMA_{windows[1]}']
-
-
-def bollinger(df, *columns, windows=(20,)):
-    '''
-    Fn to calculate upper and lower bollinger bands for stock close price
-    '''
-    for c in columns:
-        for w in windows:
-            check_columns(f'{c}_Boll_Upper_{w}', f'{c}_Boll_Lower_{w}')
-            if f'{c}_MA_{w}' or f'{c}_MA_{w}_SD' not in df:
-                ma(df, 'Close', windows=(w,))
-                std(df, f'{c}_MA_{w}', windows=(w,))
-            df[f'{c}_Boll_Upper_{w}'] = \
-                df[f'{c}_MA_{w}'] + (2 * df[f'{c}_MA_{w}_SD'])
-            df[f'{c}_Boll_Lower_{w}'] = \
-                df[f'{c}_MA_{w}'] - (2 * df[f'{c}_MA_{w}_SD'])
+    return df_column.ewm(span=window).mean()
 
 
 def std(df_column, window):
@@ -88,20 +34,40 @@ def std(df_column, window):
     return df_column.rolling(window=window).std()
 
 
-def rsi(df, *columns, windows=(14,)):
+def rsi(df_column, window):
     '''
     Function to calculate the relative strength index (RSI) of a stock column.
     Currently calculates for standard moving average.
     '''
-    for c in columns:
-        for w in windows:
-            delta = df[c].diff()
-            up, down = delta.copy(), delta.copy()
-            up[up < 0], down[down > 0] = 0, 0
-            rs = up.rolling(w).mean() / \
-                 down.abs().rolling(w).mean()
-            df[f'{c}_RSI_{w}'] = 100.0 - (100.0 / (1.0 + rs))
-    return df
+    delta = df_column.diff()
+    up, down = delta.copy(), delta.copy()
+    up[up < 0], down[down > 0] = 0, 0
+    rs = up.rolling(window).mean() / \
+         down.abs().rolling(window).mean()
+    return 100.0 - (100.0 / (1.0 + rs))
+
+
+def macd(df_column, window):
+    '''
+    Function to add moving average convergence divergence for given column to
+    df.
+    '''
+    ema_1 = exp_moving_average(df_column, window[0])
+    ema_2 = exp_moving_average(df_column, window[1])
+    return ema_1 - ema_2
+
+
+def bollinger(df_column, window, bound='Upper'):
+    '''
+    Fn to calculate upper and lower bollinger bands for given column
+    '''
+    ma = moving_average(df_column, window)
+    sd = std(df_column, window)
+    if bound == 'Upper':
+        return ma + (2 * sd)
+    elif bound == 'Lower':
+        return ma - (2 * sd)
+
 
 def risk_free_rate(risk_free_df):
     '''
