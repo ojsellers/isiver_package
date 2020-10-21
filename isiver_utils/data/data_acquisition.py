@@ -1,7 +1,7 @@
 '''
 Added to Isiver repo on 29/07/2020.
-Script containing stock_dataframe class used to download, clean, and perform
-single stock analysis with.
+Script containing stock_dataframe class used to download, clean, and calculate
+metrics within metrics file to add to dataframe.
 Limitations of yfinance API are that prices for some stock codes are lacking in
 places and intraday frequency is not possible for download periods of >60 days.
 '''
@@ -89,17 +89,21 @@ class stock_dataframe():
         '''
         self.add_metric_column(metrics.moving_average, ['Returns', 'Close'],
                                 (30,50), 'MA')
-        self.add_metric_column(metrics.moving_average, ['Close'], (30,50), 'EMA')
-        # metrics.macd(self.df, 'Close')
-        # metrics.std(self.df, 'Close_MA_20')
-        # metrics.bollinger(self.df, 'Close')
-        # metrics.rsi(self.df, 'Close')
+        self.add_metric_column(metrics.exp_moving_average, ['Close'], (30,50), 'EMA')
+        self.add_metric_column(metrics.std, ['Close'], (12,26), 'std')
+        self.add_metric_column(metrics.rsi, ['Close'], (14,), 'RSI')
+        self.add_metric_column(metrics.macd, ['Close'], ((12, 26),), 'MACD')
+        self.add_metric_column(metrics.bollinger, ['Close'], (20,), 'Boll_Upper',
+                               bound='Upper')
+        self.add_metric_column(metrics.bollinger, ['Close'], (20,), 'Boll_Lower',
+                               bound='Lower')
         return self.df
 
-    def add_metric_column(self, metric, columns, windows, metric_col_name):
+    def add_metric_column(self, metric, columns, windows, metric_col_name,
+                          **kwargs):
         '''
         Generalised function to add columns to the dataframe based on a
-        specified function
+        specified metric function
 
         :param metric: metric from metrics file e.g. metric.moving_average
         :param columns: list of column names to apply to
@@ -109,8 +113,10 @@ class stock_dataframe():
         '''
         for c in columns:
             for w in windows:
-                self.check_columns(f'{c}_{metric_col_name}_{w}')
-                self.df[f'{c}_{metric_col_name}_{w}'] = metric(self.df[c], w)
+                w_str = str(w) if type(w)==int else f'{w[0]}_{w[1]}'
+                self.check_columns(f'{c}_{metric_col_name}_{w_str}')
+                self.df[f'{c}_{metric_col_name}_{w_str}'] = metric(self.df[c], w,
+                                                                   **kwargs)
         return self.df
 
     def check_columns(self, *columns):
