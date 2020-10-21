@@ -152,16 +152,3 @@ class stock_dataframe():
         self.download_data()
         self.df = pd.concat([old_df, self.df])
         return self.pre_process(True)
-
-    def resample_returns(self, start_date, df):
-        '''
-        This is used to update the returns column of a dataframe by resampling
-        from a specified date for comparing returns with other stock dataframes.
-        To be passed to returns metric functions directly so copies without
-        changing original dataframe
-
-        :param start_date: is the date from which resampling should be done
-        :param df: dataframe on which recalculating should be performed
-        :return: resampled dataframe
-        '''
-        return stock_dataframe('',None,df[df.index>=start_date]).pre_process(False)
