@@ -1,7 +1,0 @@
-numpy
-pandas
-matplotlib
-yfinance
-datetime
-pandas_datareader
-scipy
