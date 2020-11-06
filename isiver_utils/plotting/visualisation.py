@@ -30,11 +30,9 @@ import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
 
 
+from isiver_utils import default_plot_dir
 from isiver_utils.plotting import mpl_finance_modified as mpf
 from isiver_utils.plotting import formatting
-
-# Default plot save directory *********temp************
-default_plot_dir = os.getcwd() + '/plots/'
 
 
 def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
