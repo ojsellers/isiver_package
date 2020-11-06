@@ -1,9 +1,10 @@
-'''
+"""
 @author = Isaac
 
 Functions ripped from deprecated mpl-finance module, used here as modified
 standalone module to give greater flexibility in plotting.
-'''
+"""
+
 
 from matplotlib.lines import TICKLEFT, TICKRIGHT, Line2D
 import numpy as np

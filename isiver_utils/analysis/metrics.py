@@ -9,7 +9,6 @@ TODO:
 
 import numpy as np
 import pandas as pd
-import sys
 
 
 def moving_average(df_column, window):

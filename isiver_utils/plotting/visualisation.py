@@ -1,4 +1,4 @@
-'''
+"""
 @author = Isaac
 
 Cleans and plots pandas dataframe(s) using modified mpl_finance module
@@ -18,7 +18,7 @@ TODO
     - fix kwarg output_window and save_fig issue
     - add macd subplot
 
-'''
+"""
 
 import pickle
 import os
@@ -28,6 +28,8 @@ from datetime import date
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import Formatter
+
+
 from isiver_utils.plotting import mpl_finance_modified as mpf
 from isiver_utils.plotting import formatting
 
@@ -36,7 +38,7 @@ default_plot_dir = os.getcwd() + '/plots/'
 
 
 def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
-    '''
+    """
     Wrapper function for daily OHLC graph, with volume data overlay.
 
     *args:
@@ -62,7 +64,7 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
         save_dir - directory to save plot in
 
     returns list containing fig object(s)
-    '''
+    """
     # Initialise empty lists for fig objects if they need to be returned
     plot_list = []
 
@@ -79,9 +81,9 @@ def daily_ohlcv(*stock_classes, output_window=True, save_fig=False, **kwargs):
 
 
 def generate_fig_ax():
-    '''
+    """
     Fn to generate figure and axis objects for plotting stock information
-    '''
+    """
     # Create figure and specify dimensions
     fig = plt.figure() # create figure
     ax = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, fig=fig)
@@ -89,9 +91,9 @@ def generate_fig_ax():
 
 
 def format_dates(stock_df):
-    '''
+    """
     Fn to format df index dates for plotting with matlab
-    '''
+    """
     stock_df.index = pd.to_datetime(stock_df.index)
     mdates.date2num(stock_df.index)
     # matplotlib_dates = mpl.dates.datestr2num(data.index) # If index column str
@@ -99,10 +101,10 @@ def format_dates(stock_df):
 
 
 def process_fig(save_fig=False, save_dir=default_plot_dir, output_window=True):
-    '''
+    """
     Fn to save and/or output figure depending on save_fig and output_window
     Booleans.
-    '''
+    """
     if save_fig == True:
         plt.savefig(f'{save_dir}{stock_class.ticker}.{date.today()}.png')
     if output_window == True:
@@ -111,9 +113,9 @@ def process_fig(save_fig=False, save_dir=default_plot_dir, output_window=True):
 
 def generate_daily_ohlcv(stock_df, fig, ohlcv_ax, up_colour='#53c156',
                          down_colour='#ff1717', volume_plot='bar', **kwargs):
-    '''
+    """
     Generate daily ohlcv fig and ax objects with modified mpl-finance module
-    '''
+    """
     ohlcv = prepare_ohlcv_list(stock_df)
     mpf.plot_day_summary_ohlc(ohlcv_ax, ohlcv, ticksize = 3, colorup=up_colour,
                               colordown=down_colour)
@@ -121,9 +123,9 @@ def generate_daily_ohlcv(stock_df, fig, ohlcv_ax, up_colour='#53c156',
 
 
 def prepare_ohlcv_list(stock_df):
-    '''
+    """
     Formats data into list to allow for plotting with older mpl-finance functions.
-    '''
+    """
     # extract OHLC prices into list of lists (required for old mpl-finance module)
     ohlcv_list = stock_df[['Open', 'High', 'Low', 'Close', 'Volume']].values.tolist()
     # Append adjusted dates to ohlcv_list
@@ -132,9 +134,9 @@ def prepare_ohlcv_list(stock_df):
 
 
 def plot_volume(stock_df, ohlcv_ax, volume_plot='bar'):
-    '''
+    """
     Function to overlay volume on OHLCV price plot
-    '''
+    """
     ohlcv = prepare_ohlcv_list(stock_df)
     if volume_plot != 'off':
         volumeMin = 0
@@ -157,7 +159,7 @@ def plot_volume(stock_df, ohlcv_ax, volume_plot='bar'):
 
 
 def add_indicator_arrow(ax, date, price, text, colour):
-    '''
+    """
     Adds annotation to supplied axis object
 
     Args:
@@ -167,7 +169,7 @@ def add_indicator_arrow(ax, date, price, text, colour):
         price - price value to make annotation
         text - annotation text
         colour - annotation and arrow colour
-    '''
+    """
     index_num = mdates.date2num(date) # Convert date to number to plot correctly
     ax.annotate(text, (index_num, price), (index_num, price+30),
                 arrowprops=dict(arrowstyle='->', color=colour), color=colour)

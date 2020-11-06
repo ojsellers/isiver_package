@@ -8,7 +8,7 @@ import pandas as pd
 from datetime import datetime, timedelta, date
 
 
-from isiver_utils.data.data_acquisition import stock_dataframe
+from isiver_utils.data import stock_dataframe
 
 
 class test_dataframe(unittest.TestCase):
