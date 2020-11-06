@@ -135,7 +135,11 @@ def sharpes(df, rf=0.01):
 def get_return_metrics(df, base_df, risk_free_df):
     '''
     Function to get all above metrics: sharpes, alpha, and beta
-    Have to ensure returns column in risk_free_df and base_df have the same
+
+    Have to ensure returns column in risk_free_df and base_df have the same,
+    can call this method from stock df:
+    stock_dataframe('',None,df[df.index>=start_date]).pre_process(False)
+    
     length returns column using the in-class resample_returns col
 
     :param df: stock dataframe of interest
