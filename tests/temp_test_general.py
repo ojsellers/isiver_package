@@ -5,10 +5,12 @@ Simple test function to check class functionality outside of class module
 """
 
 
-from isiver_utils.data import data_acquisition
-from isiver_utils.plotting import visualisation
 from datetime import date, timedelta
 import pandas as pd
+
+
+from isiver_utils.data import stock_dataframe
+from isiver_utils.plotting import visualisation
 
 
 def test_df_output(ticker='SMT_L', history_days=200):
@@ -18,7 +20,7 @@ def test_df_output(ticker='SMT_L', history_days=200):
     of stock data.
     """
     start_date = str(date.today() - timedelta(days=history_days))
-    stock_class = data_acquisition.stock_dataframe(ticker, start_date,
+    stock_class = stock_dataframe(ticker, start_date,
                                                    pd.DataFrame())
     stock_class.new_stock_df()
     print(stock_class.df.tail(20))
