@@ -24,7 +24,7 @@ class test_dataframe(unittest.TestCase):
         df = stock_dataframe(ticker, start_date, pd.DataFrame()).new_stock_df()
         print(df)
         self.assertTrue(149<=len(df)<=151)
-        self.assertEqual(len(df.columns), 13)
+        self.assertEqual(len(df.columns), 19)
         print('...data test passed')
 
 

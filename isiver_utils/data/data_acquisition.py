@@ -93,13 +93,18 @@ class stock_dataframe():
         self.add_metric_column(metrics.moving_average, ['Returns', 'Close'],
                                 (30,50), 'MA')
         self.add_metric_column(metrics.moving_average, ['Close'], (30,50), 'EMA')
-        # metrics.macd(self.df, 'Close')
-        # metrics.std(self.df, 'Close_MA_20')
-        # metrics.bollinger(self.df, 'Close')
-        # metrics.rsi(self.df, 'Close')
+        self.add_metric_column(metrics.exp_moving_average, ['Close'], (30,50), 'EMA')
+        self.add_metric_column(metrics.std, ['Close'], (12,26), 'std')
+        self.add_metric_column(metrics.rsi, ['Close'], (14,), 'RSI')
+        self.add_metric_column(metrics.macd, ['Close'], ((12, 26),), 'MACD')
+        self.add_metric_column(metrics.bollinger, ['Close'], (20,), 'Boll_Upper',
+                               bound='Upper')
+        self.add_metric_column(metrics.bollinger, ['Close'], (20,), 'Boll_Lower',
+                               bound='Lower')
         return self.df
 
-    def add_metric_column(self, metric, columns, windows, metric_col_name):
+    def add_metric_column(self, metric, columns, windows, metric_col_name,
+                                                            **kwargs):
         """
         Generalised function to add columns to the dataframe based on a
         specified function
@@ -113,7 +118,8 @@ class stock_dataframe():
         for c in columns:
             for w in windows:
                 self.check_columns(f'{c}_{metric_col_name}_{w}')
-                self.df[f'{c}_{metric_col_name}_{w}'] = metric(self.df[c], w)
+                self.df[f'{c}_{metric_col_name}_{w}'] = metric(self.df[c], w,
+                                                                    **kwargs)
         return self.df
 
     def check_columns(self, *columns):
